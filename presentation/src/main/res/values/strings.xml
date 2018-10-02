@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Login app</string>
     <string name="sign_up">Регистрация</string>
-    <string name="email">Email</string>
+    <string name="login">Email</string>
     <string name="enter_mail">введите почту</string>
     <string name="password">Пароль</string>
     <string name="enter_password">введите пароль</string>

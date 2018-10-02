@@ -9,8 +9,10 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import logunov.maxim.data.BuildConfig;
+import logunov.maxim.domain.entity.User;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -23,13 +25,15 @@ public class RestService {
     private RestApi restApi;
     private Gson gson;
     private ErrorParserTransformer errorParserTransformer;
+    private final String URL = "http://junior.balinasoft.com/api/account/";
+    private final int TIMEOUT = 10;
 
     @Inject
-    public RestService(String url, int timeout) {
+    public RestService() {
         OkHttpClient.Builder okHttpBuilder = new OkHttpClient
                 .Builder()
-                .readTimeout(timeout, TimeUnit.SECONDS)
-                .connectTimeout(timeout, TimeUnit.SECONDS);
+                .readTimeout(TIMEOUT, TimeUnit.SECONDS)
+                .connectTimeout(TIMEOUT, TimeUnit.SECONDS);
 
         // add logs when it's debug
         if (BuildConfig.DEBUG) {
@@ -45,12 +49,17 @@ public class RestService {
                 .Builder()
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))
-                .baseUrl(url)
+                .baseUrl(URL)
                 .client(okHttpBuilder.build())
                 .build()
                 .create(RestApi.class);
 
-        errorParserTransformer = new ErrorParserTransformer(gson);
+        errorParserTransformer = new ErrorParserTransformer();
+    }
+
+    public Completable signUp(User user){
+        return restApi.signUp(user)
+                .compose(errorParserTransformer.parseHttpError());
     }
 
 

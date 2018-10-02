@@ -1,12 +1,13 @@
 package logunov.maxim.data.network;
 
-import java.util.List;
-
-import io.reactivex.Observable;
-import retrofit2.http.GET;
-import retrofit2.http.Path;
-import retrofit2.http.Query;
+import io.reactivex.Completable;
+import logunov.maxim.domain.entity.User;
+import retrofit2.http.Body;
+import retrofit2.http.POST;
 
 public interface RestApi {
+
+    @POST("signup")
+    Completable signUp(@Body User user);
 
 }

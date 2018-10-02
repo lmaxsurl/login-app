@@ -6,6 +6,9 @@ import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
+import io.reactivex.Completable;
+import io.reactivex.CompletableSource;
+import io.reactivex.CompletableTransformer;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.ObservableTransformer;
@@ -16,23 +19,15 @@ import retrofit2.HttpException;
 
 public class ErrorParserTransformer {
 
-    private Gson gson;
+    public CompletableTransformer parseHttpError() {
 
-    public ErrorParserTransformer(Gson gson) {
-        this.gson = gson;
-    }
-
-    public <T, E extends Throwable> ObservableTransformer<T, T> parseHttpError() {
-
-        return new ObservableTransformer<T, T>() {
+        return new CompletableTransformer() {
             @Override
-            public ObservableSource<T> apply(Observable<T> upstream) {
-
+            public CompletableSource apply(Completable upstream) {
                 return upstream
-                        .onErrorResumeNext(new Function<Throwable, ObservableSource<T>>() {
+                        .onErrorResumeNext(new Function<Throwable, CompletableSource>() {
                             @Override
-                            public ObservableSource<T> apply(Throwable throwable) {
-
+                            public CompletableSource apply(Throwable throwable) throws Exception {
                                 AppError error;
                                 if (throwable instanceof HttpException) {
                                     HttpException httpException = (HttpException) throwable;
@@ -50,7 +45,7 @@ public class ErrorParserTransformer {
                                     error = new AppError("Unexpected error",
                                             ErrorType.UNEXPECTED_ERROR);
                                 }
-                                return Observable.error(error);
+                                return Completable.error(error);
                             }
                         });
             }
