@@ -8,4 +8,17 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="AppTextView">
+        <item name="android:lineSpacingExtra">@dimen/lineHeight</item>
+        <item name="android:textColor">@color/White</item>
+        <item name="android:textSize">@dimen/textSize</item>
+    </style>
+
+    <style name="AppEditText" parent="AppTextView">
+        <item name="android:layout_marginBottom">@dimen/margin</item>
+        <item name="android:layout_marginLeft">-4dp</item>
+        <item name="android:paddingBottom">@dimen/padding</item>
+        <item name="android:textColorHint">@color/LightTeal</item>
+    </style>
+
 </resources>
