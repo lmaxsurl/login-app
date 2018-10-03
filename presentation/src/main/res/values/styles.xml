@@ -21,4 +21,20 @@
         <item name="android:textColorHint">@color/LightTeal</item>
     </style>
 
+    <style name="Guideline">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:visibility">gone</item>
+    </style>
+
+    <style name="SignUpButton">
+        <item name="android:layout_marginTop">20dp</item>
+        <item name="android:background">@drawable/button_enabled</item>
+        <item name="android:text">@string/sign_up</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/White</item>
+        <item name="android:textSize">@dimen/buttonTextSize</item>
+    </style>
+
 </resources>

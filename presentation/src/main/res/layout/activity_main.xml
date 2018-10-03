@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -14,18 +15,27 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
+        android:background="@drawable/bg"
         android:paddingLeft="@dimen/padding"
-        android:paddingRight="@dimen/padding"
-        android:background="@drawable/bg">
+        android:paddingRight="@dimen/padding">
 
         <ImageView
             android:id="@+id/logo_iv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/logo"
+            android:visibility="@{viewModel.logo}"
             app:layout_constraintBottom_toTopOf="@+id/guideline_top"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent" />
+
+        <TextView
+            style="@style/AppTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@{viewModel.error}"
+            android:textColor="@color/Greenblue"
+            app:layout_constraintBottom_toTopOf="@id/email_tv" />
 
         <TextView
             android:id="@+id/email_tv"
@@ -41,6 +51,7 @@
             style="@style/AppEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:afterTextChanged="@{(s) -> viewModel.afterEmailChanged(s)}"
             android:hint="@string/enter_mail"
             android:inputType="textEmailAddress"
             android:text="@={viewModel.email}"
@@ -62,6 +73,7 @@
             style="@style/AppEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:afterTextChanged="@{(s) -> viewModel.afterPasswordChanged(s)}"
             android:hint="@string/enter_password"
             android:inputType="textPassword"
             android:text="@={viewModel.password}"
@@ -79,16 +91,11 @@
             app:layout_constraintTop_toTopOf="@+id/password_et" />
 
         <Button
-            android:id="@+id/registration_button"
+            android:id="@+id/sign_up_button"
+            style="@style/SignUpButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/button_background"
             android:onClick="@{() -> viewModel.onClick()}"
-            android:text="@string/sign_up"
-            android:textAllCaps="false"
-            android:textColor="@color/White"
-            android:textSize="@dimen/buttonTextSize"
             app:fontFamily="@font/helvetica_nue_cyr_medium"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -96,18 +103,12 @@
 
         <android.support.constraint.Guideline
             android:id="@+id/guideline_top"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:visibility="gone"
+            style="@style/Guideline"
             app:layout_constraintGuide_percent="0.23" />
 
         <android.support.constraint.Guideline
             android:id="@+id/guideline_center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:visibility="gone"
+            style="@style/Guideline"
             app:layout_constraintGuide_percent="0.54" />
 
     </android.support.constraint.ConstraintLayout>

@@ -17,10 +17,8 @@ import logunov.maxim.loginapp.R;
 import logunov.maxim.loginapp.databinding.ActivityMainBinding;
 import logunov.maxim.loginapp.presentation.base.BaseMvvmActivity;
 
-public class MainActivity extends BaseMvvmActivity<
-        MainActivityViewModel,
-        ActivityMainBinding,
-        MainActivityRouter> {
+public class MainActivity extends BaseMvvmActivity<MainActivityViewModel, ActivityMainBinding,
+        MainActivityRouter> implements ViewTreeObserver.OnGlobalLayoutListener, View.OnTouchListener {
     @Override
     protected MainActivityViewModel provideViewModel() {
         return ViewModelProviders.of(this).get(MainActivityViewModel.class);
@@ -44,45 +42,45 @@ public class MainActivity extends BaseMvvmActivity<
 
     private void init() {
         initOnTouchListener();
-        binding.container.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                Rect r = new Rect();
-                binding.container.getWindowVisibleDisplayFrame(r);
-                int screenHeight = binding.container.getRootView().getHeight();
+        initOnGlobalLayoutListener();
+    }
 
-                // r.bottom is the position above soft keypad or device button.
-                // if keypad is shown, the r.bottom is smaller than that before.
-                int keypadHeight = screenHeight - r.bottom;
-
-                if (keypadHeight > screenHeight * 0.15) { // 0.15 ratio is perhaps enough to determine keypad height.
-                    binding.logoIv.setVisibility(View.GONE);
-                } else {
-                    binding.logoIv.setVisibility(View.VISIBLE);
-                }
-            }
-        });
+    private void initOnGlobalLayoutListener() {
+        binding.container.getViewTreeObserver().addOnGlobalLayoutListener(this);
     }
 
     private void initOnTouchListener() {
-        binding.showPasswordBtn.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        binding.passwordEt
-                                .setTransformationMethod(null);
-                        break;
-                    case MotionEvent.ACTION_UP:
-                    case MotionEvent.ACTION_CANCEL:
-                        binding.passwordEt
-                                .setTransformationMethod(new PasswordTransformationMethod());
-                        break;
-                }
+        binding.showPasswordBtn.setOnTouchListener(this);
+    }
+
+    @Override
+    public void onGlobalLayout() {
+        Rect r = new Rect();
+        binding.container.getWindowVisibleDisplayFrame(r);
+        int screenHeight = binding.container.getRootView().getHeight();
+        int keypadHeight = screenHeight - r.bottom;
+        if (keypadHeight > screenHeight * 0.15) {
+            viewModel.logo.set(false);
+        } else {
+            viewModel.logo.set(true);
+        }
+    }
+
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+        switch (motionEvent.getAction()) {
+            case MotionEvent.ACTION_DOWN:
                 binding.passwordEt
-                        .setSelection(binding.passwordEt.getText().length());
-                return false;
-            }
-        });
+                        .setTransformationMethod(null);
+                break;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                binding.passwordEt
+                        .setTransformationMethod(new PasswordTransformationMethod());
+                break;
+        }
+        binding.passwordEt
+                .setSelection(binding.passwordEt.getText().length());
+        return false;
     }
 }

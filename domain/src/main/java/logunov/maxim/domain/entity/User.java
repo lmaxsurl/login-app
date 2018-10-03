@@ -3,18 +3,18 @@ package logunov.maxim.domain.entity;
 public class User implements DomainModel {
 
     private String login;
-    private String password;
+    private int userId;
 
-    public User(String login, String password) {
+    public User(String login, int userId) {
         this.login = login;
-        this.password = password;
+        this.userId = userId;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
+    public String getLogin() {
+        return login;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public int getUserId() {
+        return userId;
     }
 }

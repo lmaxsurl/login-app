@@ -3,7 +3,6 @@ package logunov.maxim.data.network;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -12,7 +11,8 @@ import javax.inject.Singleton;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import logunov.maxim.data.BuildConfig;
-import logunov.maxim.domain.entity.User;
+import logunov.maxim.data.entity.UserResponse;
+import logunov.maxim.domain.entity.UserSignUp;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -57,10 +57,9 @@ public class RestService {
         errorParserTransformer = new ErrorParserTransformer();
     }
 
-    public Completable signUp(User user){
-        return restApi.signUp(user)
-                .compose(errorParserTransformer.parseHttpError());
+    public Observable<UserResponse> signUp(UserSignUp user) {
+        return restApi
+                .signUp(user)
+                .compose(errorParserTransformer.<UserResponse, Throwable>parseHttpError());
     }
-
-
 }

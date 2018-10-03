@@ -19,15 +19,17 @@ import retrofit2.HttpException;
 
 public class ErrorParserTransformer {
 
-    public CompletableTransformer parseHttpError() {
+    public <T, E extends Throwable> ObservableTransformer<T, T> parseHttpError() {
 
-        return new CompletableTransformer() {
+        return new ObservableTransformer<T, T>() {
             @Override
-            public CompletableSource apply(Completable upstream) {
+            public ObservableSource<T> apply(Observable<T> upstream) {
+
                 return upstream
-                        .onErrorResumeNext(new Function<Throwable, CompletableSource>() {
+                        .onErrorResumeNext(new Function<Throwable, ObservableSource<T>>() {
                             @Override
-                            public CompletableSource apply(Throwable throwable) throws Exception {
+                            public ObservableSource<T> apply(Throwable throwable) {
+
                                 AppError error;
                                 if (throwable instanceof HttpException) {
                                     HttpException httpException = (HttpException) throwable;
@@ -45,7 +47,7 @@ public class ErrorParserTransformer {
                                     error = new AppError("Unexpected error",
                                             ErrorType.UNEXPECTED_ERROR);
                                 }
-                                return Completable.error(error);
+                                return Observable.error(error);
                             }
                         });
             }
