@@ -11,7 +11,12 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.ArrayAdapter;
+import android.widget.MultiAutoCompleteTextView;
 import android.widget.ScrollView;
+
+import java.util.Arrays;
+import java.util.List;
 
 import logunov.maxim.loginapp.R;
 import logunov.maxim.loginapp.databinding.ActivityMainBinding;
@@ -43,6 +48,11 @@ public class MainActivity extends BaseMvvmActivity<MainActivityViewModel, Activi
     private void init() {
         initOnTouchListener();
         initOnGlobalLayoutListener();
+        initAdapter();
+    }
+
+    private void initAdapter() {
+        binding.emailActv.setAdapter(router.getAdapter());
     }
 
     private void initOnGlobalLayoutListener() {

@@ -19,9 +19,9 @@ public class SignUpUseCase extends BaseUseCase {
         this.signUpRepository = signUpRepository;
     }
 
-    public Observable<User> signUp(UserSignUp user){
+    public Observable<User> signUp(String email, String password){
         return signUpRepository
-                .signUp(user)
+                .signUp(new UserSignUp(email.split("@")[0], password))
                 .subscribeOn(executionThread)
                 .observeOn(postExecutionThread);
     }

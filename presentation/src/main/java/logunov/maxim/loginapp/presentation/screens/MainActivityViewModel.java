@@ -4,6 +4,7 @@ import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 import android.text.Editable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import javax.inject.Inject;
 import io.reactivex.CompletableObserver;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import logunov.maxim.domain.entity.User;
 import logunov.maxim.domain.entity.UserSignUp;
 import logunov.maxim.domain.usecases.SignUpUseCase;
@@ -27,6 +29,20 @@ public class MainActivityViewModel extends BaseViewModel<MainActivityRouter> {
     private boolean emailError = false;
     private boolean passwordError = false;
 
+    private Consumer<User> doOnNext = new Consumer<User>() {
+        @Override
+        public void accept(User user) {
+            //do something with data and show that user sign up successfully
+        }
+    };
+
+    private Consumer<Throwable> doOnError = new Consumer<Throwable>() {
+        @Override
+        public void accept(Throwable e) {
+            error.set(e.getMessage());
+        }
+    };
+
     @Inject
     public SignUpUseCase signUpUseCase;
 
@@ -36,48 +52,27 @@ public class MainActivityViewModel extends BaseViewModel<MainActivityRouter> {
     }
 
     public void onClick() {
-        if(!emailError && !passwordError)
-            signUpUseCase
-                    .signUp(new UserSignUp(email.get(), password.get()))
-                    .subscribe(new Observer<User>() {
-                        @Override
-                        public void onSubscribe(Disposable d) {
-                            getCompositeDisposable().add(d);
-                        }
-
-                        @Override
-                        public void onNext(User user) {
-
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            error.set(e.getMessage());
-                        }
-
-                        @Override
-                        public void onComplete() {
-
-                        }
-                    });
+        if (!emailError && !passwordError)
+            getCompositeDisposable().add(
+                    signUpUseCase
+                            .signUp(email.get(), password.get())
+                            .subscribe(doOnNext, doOnError));
     }
 
     public void afterEmailChanged(Editable s) {
-        if (!checkEmail(s.toString())) {
-            emailError = true;
-        } else {
-            error.set("");
-            emailError = false;
-        }
+        clearError();
+        router.generateHints(s.toString());
+        emailError = !checkEmail(s.toString());
     }
 
     public void afterPasswordChanged(Editable s) {
-        if (!checkPassword(s.toString())) {
-            passwordError = true;
-        } else {
-            error.set("");
-            passwordError = false;
-        }
+        clearError();
+        passwordError = !checkPassword(s.toString());
+
+    }
+
+    private void clearError() {
+        error.set("");
     }
 
     private boolean checkPassword(String s) {
@@ -113,22 +108,22 @@ public class MainActivityViewModel extends BaseViewModel<MainActivityRouter> {
             error.set("Пропущено доменное имя сервера!");
             return false;
         }
-        List<String> arr = Arrays.asList(s.split("@"));
-        if (arr.size() != 2) {
+        String[] arr = s.split("@");
+        if (arr.length != 2) {
             error.set("Введено несколько символов '@'");
             return false;
         }
-        if (arr.get(0).endsWith("\\.") || arr.get(1).startsWith("\\.")) {
+        if (arr[0].endsWith(".") || arr[1].startsWith(".")) {
             error.set("Точка не должна стоять радом с '@'");
             return false;
         }
-        String buff = arr.get(1);
-        arr = Arrays.asList(buff.split("\\."));
-        if (arr.size() < 2) {
+        String buff = arr[1];
+        arr = buff.split("\\.");
+        if (arr.length < 2) {
             error.set("Неверно доменное имя сервера!");
             return false;
         }
-        if(arr.get(0).length() < 2 || arr.get(1).length() < 2){
+        if (arr[0].length() < 2 || arr[1].length() < 2) {
             error.set("Неверно доменное имя сервера!");
             return false;
         }

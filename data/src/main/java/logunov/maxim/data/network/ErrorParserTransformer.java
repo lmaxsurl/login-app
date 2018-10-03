@@ -2,6 +2,7 @@ package logunov.maxim.data.network;
 
 import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
@@ -15,6 +16,7 @@ import io.reactivex.ObservableTransformer;
 import io.reactivex.functions.Function;
 import logunov.maxim.domain.entity.AppError;
 import logunov.maxim.domain.entity.ErrorType;
+import okhttp3.ResponseBody;
 import retrofit2.HttpException;
 
 public class ErrorParserTransformer {
@@ -33,9 +35,22 @@ public class ErrorParserTransformer {
                                 AppError error;
                                 if (throwable instanceof HttpException) {
                                     HttpException httpException = (HttpException) throwable;
-                                    error = new AppError(httpException.getMessage(),
+                                    error = new AppError(throwable.getMessage(),
                                             ErrorType.SERVER_ERROR);
-
+                                    try {
+                                        if (httpException.response().errorBody().string().contains("login-already")) {
+                                            error = new AppError("Данный логин уже занят",
+                                                    ErrorType.INPUT_ERROR);
+                                        } else if (httpException.response().errorBody().string().contains("login")) {
+                                            error = new AppError("Проверьте правильность ввода логина",
+                                                    ErrorType.INPUT_ERROR);
+                                        }
+                                    } catch (IOException e) {
+                                        if (httpException.code() == 400) {
+                                            error = new AppError("Проверьте введенные данные",
+                                                    ErrorType.INPUT_ERROR);
+                                        }
+                                    }
                                 } else if (throwable instanceof UnknownHostException) {
                                     error = new AppError("Server is not available",
                                             ErrorType.SERVER_IS_NOT_AVAILABLE);
