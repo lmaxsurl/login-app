@@ -26,8 +26,8 @@ public class MainActivityViewModel extends BaseViewModel<MainActivityRouter> {
     public ObservableField<String> password = new ObservableField<>("");
     public ObservableField<String> error = new ObservableField<>("");
     public ObservableBoolean logo = new ObservableBoolean(true);
-    private boolean emailError = false;
-    private boolean passwordError = false;
+    private boolean emailError = true;
+    private boolean passwordError = true;
 
     private Consumer<User> doOnNext = new Consumer<User>() {
         @Override
@@ -57,6 +57,8 @@ public class MainActivityViewModel extends BaseViewModel<MainActivityRouter> {
                     signUpUseCase
                             .signUp(email.get(), password.get())
                             .subscribe(doOnNext, doOnError));
+        else
+            error.set("Проверьте правильность введенных данных!");
     }
 
     public void afterEmailChanged(Editable s) {
